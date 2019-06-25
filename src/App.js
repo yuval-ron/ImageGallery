@@ -1,26 +1,61 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
+import Search from './Search.js';
+import {loadImages, composeImageUrl} from './Utils.js';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends Component {
+  state = {
+    searchText: '',
+    images: null,
+    isLoadingNewImages: false
+  }
+
+  searchImages = (searchText) => {
+    if (!searchText) {
+      return this.setState({
+        searchText,
+        images: null,
+        isLoadingNewImages: false
+      })
+    }
+
+    this.setState({isLoadingNewImages: true, searchText})
+
+    loadImages(searchText).then((images) => {
+      this.setState({
+        images,
+        isLoadingNewImages: false,
+      })
+    })
+  }
+
+  render() {
+    const {images, isLoadingNewImages, searchText} = this.state
+
+    return (
+      <div className="App">
+        <Search searchImages={this.searchImages} />
+        <div className="images-container">
+          {isLoadingNewImages ?
+            <div className="message loading-message">loading...</div>
+            :
+            <ImagesCollection images={images} searchText={searchText} />
+          }
+        </div>
+      </div>
+    );
+  }
 }
 
-export default App;
+const ImagesCollection = ({images, searchText}) => {
+  if (!images) {
+    return <div className="message">Please search images!</div>
+  } else if (images.length === 0) {
+    return <div className="message">{`No results for "${searchText}".`}</div>
+  } else {
+    return images.map((image) => {
+      const url = composeImageUrl(image)
+      return (<img key={image.id} alt="" className="image-item" src={url} />)
+    })
+  }
+}
