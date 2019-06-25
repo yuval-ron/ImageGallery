@@ -1,36 +1,25 @@
 import React, {Component} from 'react';
 import Search from './Search.js';
-import {loadImages, composeImageUrl} from './Utils.js';
+import {composeImageUrl} from './Utils.js';
+import {searchImages} from './modules/actions.js'
+import { connect } from 'react-redux';
 import './App.css';
 
-export default class App extends Component {
+class App extends Component {
   state = {
-    searchText: '',
-    images: null,
-    isLoadingNewImages: false
+    searchText: ''
   }
 
   searchImages = (searchText) => {
-    if (!searchText) {
-      return this.setState({
-        searchText,
-        images: null,
-        isLoadingNewImages: false
-      })
-    }
+    const {searchImages} = this.props
 
-    this.setState({isLoadingNewImages: true, searchText})
-
-    loadImages(searchText).then((images) => {
-      this.setState({
-        images,
-        isLoadingNewImages: false,
-      })
-    })
+    this.setState({searchText})
+    searchImages(searchText)
   }
 
   render() {
-    const {images, isLoadingNewImages, searchText} = this.state
+    const {searchText} = this.state
+    const {images, isLoadingNewImages} = this.props
 
     return (
       <div className="App">
@@ -46,6 +35,15 @@ export default class App extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  images: state.imagesData.images,
+  isLoadingNewImages: state.imagesData.isLoadingNewImages,
+})
+
+const mapDispatchToProps = {searchImages}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 const ImagesCollection = ({images, searchText}) => {
   if (!images) {
