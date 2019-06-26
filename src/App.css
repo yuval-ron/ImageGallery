@@ -8,7 +8,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 10px;
-  height: 180px;
+  height: 210px;
   position: fixed;
   top: 0;
   right: 0;
@@ -25,6 +25,20 @@ body {
 
 .sub-title {
   font-size: 22px;
+}
+
+.save-search-button {
+  font-size: 15px;
+  margin-top: 15px;
+  cursor: pointer;
+  text-align: center;
+  border-bottom: 1px solid white;
+  width: 110px;
+  transition: width 0.3s ease-in-out;
+}
+
+.save-search-button:hover {
+  width: 140px;
 }
 
 .search-input {
@@ -51,7 +65,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
-  margin-top: 180px;
+  margin-top: 210px;
 }
 
 .images-container .image-item {
@@ -80,6 +94,9 @@ body {
   animation: loading 1s infinite;
 }
 
+.save-message {
+  animation: loading 1s infinite;
+}
 @keyframes fade-in {
   0% {
     opacity: 0;

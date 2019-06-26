@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import Search from './Search.js';
-import {composeImageUrl} from './Utils.js';
-import {searchImages} from './modules/actions.js'
-import { connect } from 'react-redux';
-import './App.css';
+import React, {Component} from 'react'
+import Search from './Search.js'
+import {composeImageUrl} from './Utils.js'
+import {searchImages, saveSearch} from './modules/actions.js'
+import { connect } from 'react-redux'
+import './App.css'
 
 class App extends Component {
   state = {
@@ -17,33 +17,47 @@ class App extends Component {
     searchImages(searchText)
   }
 
-  render() {
+  saveSearch = () => {
     const {searchText} = this.state
-    const {images, isLoadingNewImages} = this.props
+    const {saveSearch, images} = this.props
 
+    saveSearch(searchText, images)
+  }
+
+  renderImagesContainerContent = () => {
+    const {images, isLoadingNewImages, isSearchSaveLoading} = this.props
+    const {searchText} = this.state
+
+    if (isLoadingNewImages) {
+      return <div className="message loading-message">loading...</div>
+    } else if (isSearchSaveLoading) {
+      return <div className="message save-message">saving...</div>
+    } else if (images) {
+      return <ImagesCollection images={images} searchText={searchText} />
+    }
+  }
+
+  render() {
     return (
       <div className="App">
-        <Search searchImages={this.searchImages} />
+        <Search searchImages={this.searchImages} saveSearch={this.saveSearch} />
         <div className="images-container">
-          {isLoadingNewImages ?
-            <div className="message loading-message">loading...</div>
-            :
-            <ImagesCollection images={images} searchText={searchText} />
-          }
+          {this.renderImagesContainerContent()}
         </div>
       </div>
-    );
+    )
   }
 }
 
 const mapStateToProps = state => ({
   images: state.imagesData.images,
   isLoadingNewImages: state.imagesData.isLoadingNewImages,
+  isSearchSaveLoading: state.imagesData.isSearchSaveLoading
 })
 
-const mapDispatchToProps = {searchImages}
+const mapDispatchToProps = {searchImages, saveSearch}
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App)
 
 const ImagesCollection = ({images, searchText}) => {
   if (!images) {

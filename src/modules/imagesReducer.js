@@ -1,6 +1,7 @@
 const initialState = {
   images: null,
-  isLoadingNewImages: false
+  isLoadingNewImages: false,
+  isSearchSaveLoading: false
 }
 
 export default (state = initialState, {type, payload}) => {
@@ -25,7 +26,19 @@ export default (state = initialState, {type, payload}) => {
         images: null
       }
     }
+    case 'IMAGES@SEARCH_SAVE_LOADING': {
+      return {
+        ...state,
+        isSearchSaveLoading: true,
+      }
+    }
+    case 'IMAGES@IMAGES@SEARCH_SAVE_SUCCESS': {
+      return {
+        ...state,
+        isSearchSaveLoading: false,
+      }
+    }
     default:
-      return state;
+      return state
   }
 }
