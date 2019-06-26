@@ -25,22 +25,26 @@ class App extends Component {
   }
 
   renderImagesContainerContent = () => {
-    const {images, isLoadingNewImages, isSearchSaveLoading} = this.props
+    const {images, isLoadingNewImages} = this.props
     const {searchText} = this.state
 
     if (isLoadingNewImages) {
       return <div className="message loading-message">loading...</div>
-    } else if (isSearchSaveLoading) {
-      return <div className="message save-message">saving...</div>
     } else if (images) {
-      return <ImagesCollection images={images} searchText={searchText} />
+        return <ImagesCollection images={images} searchText={searchText} />
     }
   }
 
   render() {
+    const {isSearchSaveLoading, shouldShowSuccessMessage} = this.props
     return (
       <div className="App">
-        <Search searchImages={this.searchImages} saveSearch={this.saveSearch} />
+        <Search
+          searchImages={this.searchImages}
+          saveSearch={this.saveSearch}
+          isSearchSaveLoading={isSearchSaveLoading}
+          shouldShowSuccessMessage={shouldShowSuccessMessage}
+        />
         <div className="images-container">
           {this.renderImagesContainerContent()}
         </div>
@@ -52,7 +56,8 @@ class App extends Component {
 const mapStateToProps = state => ({
   images: state.imagesData.images,
   isLoadingNewImages: state.imagesData.isLoadingNewImages,
-  isSearchSaveLoading: state.imagesData.isSearchSaveLoading
+  isSearchSaveLoading: state.imagesData.isSearchSaveLoading,
+  shouldShowSuccessMessage: state.imagesData.shouldShowSuccessMessage
 })
 
 const mapDispatchToProps = {searchImages, saveSearch}

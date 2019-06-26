@@ -29,7 +29,10 @@ export const saveSearch = (searchText, images) => {
       return asyncLocalStorage.setItem('searchResults', JSON.stringify(searchResults))
     })
     .then(() => {
-      dispatch({type: 'IMAGES@IMAGES@SEARCH_SAVE_SUCCESS'})
+      dispatch({type: 'IMAGES@SEARCH_SAVE_SUCCESS'})
+      setTimeout(() => {
+        dispatch({type: 'IMAGES@HIDE_SAVE_SUCCESS_MESSAGE'})
+      }, 2000)
     })
   }
 }
