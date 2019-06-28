@@ -1,8 +1,9 @@
 import React, {Component} from 'react'
+import { connect } from 'react-redux'
 import Search from './Search.js'
+import PreviousSearches from './PreviousSearches.js'
 import {composeImageUrl} from './Utils.js'
 import {searchImages, saveSearch} from './modules/actions.js'
-import { connect } from 'react-redux'
 import './App.css'
 
 class App extends Component {
@@ -10,11 +11,11 @@ class App extends Component {
     searchText: ''
   }
 
-  searchImages = (searchText) => {
+  searchImages = (searchText, previousSearchValues) => {
     const {searchImages} = this.props
 
     this.setState({searchText})
-    searchImages(searchText)
+    searchImages(searchText, previousSearchValues)
   }
 
   saveSearch = () => {
@@ -22,6 +23,10 @@ class App extends Component {
     const {saveSearch, images} = this.props
 
     saveSearch(searchText, images)
+  }
+
+  onPreviousSearchClick = (previousSearchText, previousSearchValues) => {
+    this.searchImages(previousSearchText, previousSearchValues)
   }
 
   renderImagesContainerContent = () => {
@@ -39,15 +44,19 @@ class App extends Component {
     const {isSearchSaveLoading, shouldShowSuccessMessage} = this.props
     return (
       <div className="App">
-        <Search
-          searchImages={this.searchImages}
-          saveSearch={this.saveSearch}
-          isSearchSaveLoading={isSearchSaveLoading}
-          shouldShowSuccessMessage={shouldShowSuccessMessage}
-        />
-        <div className="images-container">
-          {this.renderImagesContainerContent()}
+        <div className="image-gallery">
+          <Search
+            searchImages={this.searchImages}
+            saveSearch={this.saveSearch}
+            isSearchSaveLoading={isSearchSaveLoading}
+            shouldShowSuccessMessage={shouldShowSuccessMessage}
+            searchText={this.state.searchText}
+          />
+          <div className="images-container">
+            {this.renderImagesContainerContent()}
+          </div>
         </div>
+        <PreviousSearches onPreviousSearchClick={this.onPreviousSearchClick} />
       </div>
     )
   }
@@ -70,7 +79,9 @@ const ImagesCollection = ({images, searchText}) => {
   } else if (images.length === 0) {
     return <div className="message">{`No results for "${searchText}".`}</div>
   } else {
-    return images.map((image) => {
+    return Object.keys(images).map((imageId) => {
+      const image = images[imageId]
+
       const url = composeImageUrl(image)
       return (<img key={image.id} alt="" className="image-item" src={url} />)
     })

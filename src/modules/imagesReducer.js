@@ -46,6 +46,12 @@ export default (state = initialState, {type, payload}) => {
         shouldShowSuccessMessage: false
       }
     }
+    case 'IMAGES@LOAD_PREVIOUS_SEARCHES_SUCCESS': {
+      return {
+        ...state,
+        previousSearches: payload.previousSearches
+      }
+    }
     default:
       return state
   }

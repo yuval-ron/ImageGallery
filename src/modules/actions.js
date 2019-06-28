@@ -1,6 +1,19 @@
 import {loadImages} from '../Utils.js'
 
-export const searchImages = (searchText) => {
+export const loadPreviousSearches = () => {
+  return (dispatch) => {
+    asyncLocalStorage.getItem('searchResults')
+      .then((result) => {
+        const previousSearches = JSON.parse(result) || {}
+        dispatch({
+          type: 'IMAGES@LOAD_PREVIOUS_SEARCHES_SUCCESS',
+          payload: {previousSearches}
+        })
+      })
+  }
+}
+
+export const searchImages = (searchText, previousSearchValues) => {
   return (dispatch) => {
     if (!searchText) {
       return dispatch({type: 'IMAGES@CLEAR_IMAGES'})
@@ -8,12 +21,19 @@ export const searchImages = (searchText) => {
 
     dispatch({type: 'IMAGES@IMAGES_LOADING'})
 
-    loadImages(searchText).then((images) => {
+    if (previousSearchValues) {
       dispatch({
         type: 'IMAGES@IMAGES_LOADED_SUCCESS',
-        payload: {images}
+        payload: {images: previousSearchValues}
       })
-    })
+    } else {
+      loadImages(searchText).then((images) => {
+        dispatch({
+          type: 'IMAGES@IMAGES_LOADED_SUCCESS',
+          payload: {images}
+        })
+      })
+    }
   }
 }
 
@@ -22,18 +42,19 @@ export const saveSearch = (searchText, images) => {
     dispatch({type: 'IMAGES@SEARCH_SAVE_LOADING'})
 
     asyncLocalStorage.getItem('searchResults')
-    .then((result) => {
-      let searchResults = JSON.parse(result) || {}
-      searchResults[searchText] = images
+      .then((result) => {
+        let searchResults = JSON.parse(result) || {}
+        searchResults[searchText] = images
 
-      return asyncLocalStorage.setItem('searchResults', JSON.stringify(searchResults))
-    })
-    .then(() => {
-      dispatch({type: 'IMAGES@SEARCH_SAVE_SUCCESS'})
-      setTimeout(() => {
-        dispatch({type: 'IMAGES@HIDE_SAVE_SUCCESS_MESSAGE'})
-      }, 2000)
-    })
+        return asyncLocalStorage.setItem('searchResults', JSON.stringify(searchResults))
+      })
+      .then(() => {
+        dispatch({type: 'IMAGES@SEARCH_SAVE_SUCCESS'})
+
+        setTimeout(() => {
+          dispatch({type: 'IMAGES@HIDE_SAVE_SUCCESS_MESSAGE'})
+        }, 2000)
+      })
   }
 }
 

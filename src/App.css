@@ -67,6 +67,29 @@ body {
   color: white;
 }
 
+.previous-search-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.previous-search-item:hover {
+  color: red;
+}
+
+.search, .union-search, .intersection-search {
+  background: #eee;
+  width: 80%;
+  margin: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.previous-search-checkbox {
+  cursor: pointer;
+}
+
 .images-container {
   display: flex;
   flex-wrap: wrap;
@@ -105,6 +128,17 @@ body {
 .save-message {
   animation: loading 1s infinite;
 }
+
+.previous-search-side-bar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  width: 20%;
+  background: rgba(255, 255, 255, 0.8);
+}
+
 @keyframes fade-in {
   0% {
     opacity: 0;

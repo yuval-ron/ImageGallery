@@ -31,7 +31,7 @@ export default class Search extends Component {
           <AccessAlarmIcon className="previous-search-button" />
           <div className="title">Image Gallery</div>
           <div className="title sub-title">Search for images</div>
-          <input type="text" className="search-input" onChange={this.handleChangeText}></input>
+          <input type="text" className="search-input" value={this.props.searchText} onChange={this.handleChangeText}></input>
           {this.renderSaveSearchContent()}
         </div>
       </div>
