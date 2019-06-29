@@ -1,10 +1,10 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
-import Search from './Search.js'
-import PreviousSearches from './PreviousSearches.js'
+import Search from './images/components/Search.js'
+import PreviousSearches from './images/components/PreviousSearches.js'
 import {composeImageUrl, composeSearchTextAsTags} from './Utils.js'
-import {searchImages, loadMoreImages, saveSearch, showTypingMessage, togglePreviousSearches} from './modules/actions.js'
+import {searchImages, loadMoreImages, saveSearch, showTypingMessage, togglePreviousSearches} from './images/actions.js'
 import './App.css'
 
 class App extends Component {
@@ -14,14 +14,14 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.imagesContainerRef.onscroll = (e) => {
+    this.imagesContainerRef.addEventListener('scroll', (e) => {
       const isScrollEnded = (this.imagesContainerRef.scrollTop + this.imagesContainerRef.offsetHeight) === this.imagesContainerRef.scrollHeight
       const isScrollExist = this.imagesContainerRef.scrollHeight > this.imagesContainerRef.offsetHeight
 
       if (isScrollExist && isScrollEnded) {
         this.loadMoreImages()
       }
-    }
+    })
   }
 
   loadMoreImages = () => {
@@ -94,7 +94,7 @@ class App extends Component {
             togglePreviousSearches={togglePreviousSearches}
             isPreviousSearchesVisible={isPreviousSearchesVisible}
           />
-          <div className="images-container" ref={this.setImageContainerRef}>
+          <div className={`images-container ${isPreviousSearchesVisible ? 'blur' : ''}`} ref={this.setImageContainerRef}>
             {this.renderImagesContainerContent()}
             {isInfiniteScrollingEnded &&
               <div className="no-more-results message">No more images to show</div>

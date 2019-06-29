@@ -137,6 +137,13 @@ body {
   left: 0;
   bottom: 0;
   overflow-y: auto;
+  transform: scale(1);
+  transition: all 0.3s ease-in-out;
+}
+
+.images-container.blur {
+  filter: blur(10px);
+  transform: scale(0.8);
 }
 
 .images-container .image-item {
@@ -202,7 +209,8 @@ body {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.no-prev-searches {
+.prev-searches-title {
+  font-weight: 700;
   padding: 20px;
   text-align: center;
 }
