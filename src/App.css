@@ -27,18 +27,36 @@ body {
   font-size: 22px;
 }
 
-.save-search-button, .save-loading-message, .save-success-message {
+.search-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.save-search-button,
+.save-loading-message,
+.save-success-message,
+.show-history-search-button {
   font-size: 15px;
-  margin-top: 15px;
   cursor: pointer;
   text-align: center;
   border-bottom: 1px solid white;
-  width: 110px;
+  width: 150px;
   transition: width 0.3s ease-in-out;
+  margin: 5px;
+  margin-top: 15px;
 }
 
-.save-search-button:hover {
-  width: 140px;
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.save-success-message,
+.save-loading-message,
+.save-search-button:hover,
+.show-history-search-button:hover {
+  width: 190px;
 }
 
 .search-input {
@@ -70,20 +88,36 @@ body {
 .previous-search-item {
   display: flex;
   justify-content: space-between;
-  margin: 10px;
+  padding: 10px;
   cursor: pointer;
+  font-size: 18px;
+}
+
+.previous-search-item.selected {
+  background-color: #aaa;
 }
 
 .previous-search-item:hover {
-  color: red;
+  color: white;
+  background-color: #333;
 }
 
-.search, .union-search, .intersection-search {
+.previous-search-item.selected:hover {
+  color: white;
+  background-color: #555;
+}
+
+.search-button {
   background: #eee;
-  width: 80%;
-  margin: 10px;
+  width: 200px;
+  margin: 20px auto;
   text-align: center;
   cursor: pointer;
+  transition: width 0.3s ease-in-out;
+}
+
+.search-button:hover {
+  width: 240px;
 }
 
 .previous-search-checkbox {
@@ -127,6 +161,11 @@ body {
   padding: 50px;
 }
 
+.no-more-results {
+  width: 100%;
+  text-align: center;
+}
+
 .loading-message {
   animation: loading 1s infinite;
 }
@@ -141,8 +180,31 @@ body {
   bottom: 0;
   left: 0;
   z-index: 10;
-  width: 20%;
+  width: 300px;
   background: rgba(255, 255, 255, 0.8);
+  transform: translateX(-300px);
+  transition: transform 0.5s ease-in-out;
+}
+
+.previous-search-side-bar.visible {
+  transform: translateX(0px);
+}
+/*
+.previous-searches-list {
+  overflow-y: auto;
+}*/
+
+.previous-search-controls {
+  position: absolute;
+  bottom: 50px;
+  right: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.no-prev-searches {
+  padding: 20px;
+  text-align: center;
 }
 
 @keyframes fade-in {

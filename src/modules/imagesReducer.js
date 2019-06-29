@@ -6,6 +6,7 @@ const initialState = {
   isSearchSaveLoading: false,
   shouldShowSuccessMessage: false,
   isTypingMessageVisible: false,
+  isPreviousSearchesVisible: false,
   previousSearches: []
 }
 
@@ -66,10 +67,10 @@ export default (state = initialState, {type, payload}) => {
         ...state,
         isSearchSaveLoading: false,
         shouldShowSuccessMessage: true,
-        previousSearches: [
+        previousSearches: {
           ...state.previousSearches,
-          payload.searchText
-        ]
+          [payload.searchText]: ''
+        }
       }
     }
     case 'IMAGES@HIDE_SAVE_SUCCESS_MESSAGE': {
@@ -82,6 +83,12 @@ export default (state = initialState, {type, payload}) => {
       return {
         ...state,
         previousSearches: payload.previousSearches
+      }
+    }
+    case 'IMAGES@TOGGLE_PREVIOUS_SEARCHES': {
+      return {
+        ...state,
+        isPreviousSearchesVisible: !state.isPreviousSearchesVisible
       }
     }
     default:

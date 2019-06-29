@@ -4,7 +4,7 @@ export const loadPreviousSearches = () => {
   return (dispatch) => {
     asyncLocalStorage.getItem('previousSearches')
       .then((result) => {
-        const previousSearches = JSON.parse(result) || []
+        const previousSearches = JSON.parse(result) || {}
         dispatch({
           type: 'IMAGES@LOAD_PREVIOUS_SEARCHES_SUCCESS',
           payload: {previousSearches}
@@ -21,7 +21,7 @@ export const searchImages = (searchText, searchMode, page) => {
 
     dispatch({type: 'IMAGES@IMAGES_LOADING'})
 
-    loadImages(searchText, searchMode, page).then(({images, page, pages}) => {
+    loadImages(searchText, {searchMode, page}).then(({images, page, pages}) => {
       dispatch({
         type: 'IMAGES@IMAGES_LOADED_SUCCESS',
         payload: {images, page, pages}
@@ -32,7 +32,7 @@ export const searchImages = (searchText, searchMode, page) => {
 
 export const loadMoreImages = (searchText, currentPage) => {
   return (dispatch) => {
-    loadImages(searchText, null, currentPage).then(({images, page, pages}) => {
+    loadImages(searchText, {page: currentPage}).then(({images, page, pages}) => {
       dispatch({
         type: 'IMAGES@IMAGES_LOADED_MORE_SUCCESS',
         payload: {images, page, pages}
@@ -51,9 +51,9 @@ export const saveSearch = (searchText) => {
 
     asyncLocalStorage.getItem('previousSearches')
       .then((result) => {
-        const previousSearches = JSON.parse(result) || []
+        const previousSearches = JSON.parse(result) || {}
 
-        previousSearches.push(searchText)
+        previousSearches[searchText] = ''
         return asyncLocalStorage.setItem('previousSearches', JSON.stringify(previousSearches))
       })
       .then(() => {
@@ -67,6 +67,10 @@ export const saveSearch = (searchText) => {
         }, 2000)
       })
   }
+}
+
+export const togglePreviousSearches = () => {
+  return {type: 'IMAGES@TOGGLE_PREVIOUS_SEARCHES'}
 }
 
 // I am making this async in order

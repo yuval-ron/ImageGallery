@@ -4,17 +4,21 @@ import {debounce} from 'lodash'
 import Search from './Search.js'
 import PreviousSearches from './PreviousSearches.js'
 import {composeImageUrl, composeSearchTextAsTags} from './Utils.js'
-import {searchImages, loadMoreImages, saveSearch, showTypingMessage} from './modules/actions.js'
+import {searchImages, loadMoreImages, saveSearch, showTypingMessage, togglePreviousSearches} from './modules/actions.js'
 import './App.css'
 
 class App extends Component {
   state = {
-    searchText: ''
+    searchText: '',
+    isInfiniteScrollingEnded: false
   }
 
   componentDidMount() {
-    this.imagesContainerRef.onscroll = () => {
-      if ((this.imagesContainerRef.scrollTop + this.imagesContainerRef.offsetHeight) === this.imagesContainerRef.scrollHeight) {
+    this.imagesContainerRef.onscroll = (e) => {
+      const isScrollEnded = (this.imagesContainerRef.scrollTop + this.imagesContainerRef.offsetHeight) === this.imagesContainerRef.scrollHeight
+      const isScrollExist = this.imagesContainerRef.scrollHeight > this.imagesContainerRef.offsetHeight
+
+      if (isScrollExist && isScrollEnded) {
         this.loadMoreImages()
       }
     }
@@ -28,7 +32,7 @@ class App extends Component {
       loadMoreImages(searchText, currentPage + 1)
     }
     else {
-      console.log("its the enddddd")
+      this.setState({isInfiniteScrollingEnded: true})
     }
   }
 
@@ -37,7 +41,10 @@ class App extends Component {
     const searchText = composeSearchTextAsTags(searchValue)
     const searchModeToDisplay = searchMode ? ` - (${searchMode === 'any' ? 'OR' : 'AND'})` : ''
 
-    this.setState({searchText: `${searchText}${searchModeToDisplay}`})
+    this.setState({
+      searchText: `${searchText}${searchModeToDisplay}`,
+      isInfiniteScrollingEnded: false
+    })
     if (shouldShowTypingMessage) {
       showTypingMessage()
     }
@@ -73,7 +80,8 @@ class App extends Component {
   }
 
   render() {
-    const {isSearchSaveLoading, shouldShowSuccessMessage} = this.props
+    const {isSearchSaveLoading, shouldShowSuccessMessage, togglePreviousSearches, isPreviousSearchesVisible} = this.props
+    const {isInfiniteScrollingEnded} = this.state
     return (
       <div className="App">
         <div className="image-gallery">
@@ -83,12 +91,17 @@ class App extends Component {
             isSearchSaveLoading={isSearchSaveLoading}
             shouldShowSuccessMessage={shouldShowSuccessMessage}
             searchText={this.state.searchText}
+            togglePreviousSearches={togglePreviousSearches}
+            isPreviousSearchesVisible={isPreviousSearchesVisible}
           />
           <div className="images-container" ref={this.setImageContainerRef}>
             {this.renderImagesContainerContent()}
+            {isInfiniteScrollingEnded &&
+              <div className="no-more-results message">No more images to show</div>
+            }
           </div>
         </div>
-        <PreviousSearches searchImages={this.searchImages} />
+        <PreviousSearches searchImages={this.searchImages} isVisible={isPreviousSearchesVisible} />
       </div>
     )
   }
@@ -100,11 +113,12 @@ const mapStateToProps = state => ({
   totalPages: state.imagesData.totalPages,
   isLoadingNewImages: state.imagesData.isLoadingNewImages,
   isSearchSaveLoading: state.imagesData.isSearchSaveLoading,
+  isPreviousSearchesVisible: state.imagesData.isPreviousSearchesVisible,
   shouldShowSuccessMessage: state.imagesData.shouldShowSuccessMessage,
   isTypingMessageVisible: state.imagesData.isTypingMessageVisible
 })
 
-const mapDispatchToProps = {searchImages, loadMoreImages, saveSearch, showTypingMessage}
+const mapDispatchToProps = {searchImages, loadMoreImages, saveSearch, showTypingMessage, togglePreviousSearches}
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
 
@@ -122,5 +136,6 @@ const ImagesCollection = ({images, searchText, isTypingMessageVisible}) => {
       const url = composeImageUrl(image)
       return (<img key={image.id} alt="" className="image-item" src={url} />)
     })
+
   }
 }
