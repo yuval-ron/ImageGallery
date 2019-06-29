@@ -1,5 +1,7 @@
 const initialState = {
   images: null,
+  currentPage: null,
+  totalPages: null,
   isLoadingNewImages: false,
   isSearchSaveLoading: false,
   shouldShowSuccessMessage: false,
@@ -20,7 +22,22 @@ export default (state = initialState, {type, payload}) => {
         ...state,
         isLoadingNewImages: false,
         isTypingMessageVisible: false,
-        images: payload.images
+        images: payload.images,
+        currentPage: payload.page,
+        totalPages: payload.pages
+      }
+    }
+    case 'IMAGES@IMAGES_LOADED_MORE_SUCCESS': {
+      return {
+        ...state,
+        isLoadingNewImages: false,
+        isTypingMessageVisible: false,
+        currentPage: payload.page,
+        totalPages: payload.pages,
+        images: [
+          ...state.images,
+          ...payload.images
+        ]
       }
     }
     case 'IMAGES@CLEAR_IMAGES': {

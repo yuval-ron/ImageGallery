@@ -97,6 +97,12 @@ body {
   align-items: center;
   padding: 20px;
   margin-top: 210px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
 }
 
 .images-container .image-item {

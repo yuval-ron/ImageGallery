@@ -13,7 +13,7 @@ export const loadPreviousSearches = () => {
   }
 }
 
-export const searchImages = (searchText, searchMode) => {
+export const searchImages = (searchText, searchMode, page) => {
   return (dispatch) => {
     if (!searchText) {
       return dispatch({type: 'IMAGES@CLEAR_IMAGES'})
@@ -21,10 +21,21 @@ export const searchImages = (searchText, searchMode) => {
 
     dispatch({type: 'IMAGES@IMAGES_LOADING'})
 
-    loadImages(searchText, searchMode).then((images) => {
+    loadImages(searchText, searchMode, page).then(({images, page, pages}) => {
       dispatch({
         type: 'IMAGES@IMAGES_LOADED_SUCCESS',
-        payload: {images}
+        payload: {images, page, pages}
+      })
+    })
+  }
+}
+
+export const loadMoreImages = (searchText, currentPage) => {
+  return (dispatch) => {
+    loadImages(searchText, null, currentPage).then(({images, page, pages}) => {
+      dispatch({
+        type: 'IMAGES@IMAGES_LOADED_MORE_SUCCESS',
+        payload: {images, page, pages}
       })
     })
   }
