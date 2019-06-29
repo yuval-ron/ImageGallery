@@ -2,7 +2,9 @@ const initialState = {
   images: null,
   isLoadingNewImages: false,
   isSearchSaveLoading: false,
-  shouldShowSuccessMessage: false
+  shouldShowSuccessMessage: false,
+  isTypingMessageVisible: false,
+  previousSearches: []
 }
 
 export default (state = initialState, {type, payload}) => {
@@ -17,6 +19,7 @@ export default (state = initialState, {type, payload}) => {
       return {
         ...state,
         isLoadingNewImages: false,
+        isTypingMessageVisible: false,
         images: payload.images
       }
     }
@@ -24,6 +27,7 @@ export default (state = initialState, {type, payload}) => {
       return {
         ...state,
         isLoadingNewImages: false,
+        isTypingMessageVisible: false,
         images: null
       }
     }
@@ -31,6 +35,13 @@ export default (state = initialState, {type, payload}) => {
       return {
         ...state,
         isSearchSaveLoading: true,
+        isTypingMessageVisible: false
+      }
+    }
+    case 'IMAGES@SHOW_TYPING_MESSAGE': {
+      return {
+        ...state,
+        isTypingMessageVisible: true
       }
     }
     case 'IMAGES@SEARCH_SAVE_SUCCESS': {
@@ -38,6 +49,10 @@ export default (state = initialState, {type, payload}) => {
         ...state,
         isSearchSaveLoading: false,
         shouldShowSuccessMessage: true,
+        previousSearches: [
+          ...state.previousSearches,
+          payload.searchText
+        ]
       }
     }
     case 'IMAGES@HIDE_SAVE_SUCCESS_MESSAGE': {

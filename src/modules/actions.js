@@ -2,9 +2,9 @@ import {loadImages} from '../Utils.js'
 
 export const loadPreviousSearches = () => {
   return (dispatch) => {
-    asyncLocalStorage.getItem('searchResults')
+    asyncLocalStorage.getItem('previousSearches')
       .then((result) => {
-        const previousSearches = JSON.parse(result) || {}
+        const previousSearches = JSON.parse(result) || []
         dispatch({
           type: 'IMAGES@LOAD_PREVIOUS_SEARCHES_SUCCESS',
           payload: {previousSearches}
@@ -13,7 +13,7 @@ export const loadPreviousSearches = () => {
   }
 }
 
-export const searchImages = (searchText, previousSearchValues) => {
+export const searchImages = (searchText, searchMode) => {
   return (dispatch) => {
     if (!searchText) {
       return dispatch({type: 'IMAGES@CLEAR_IMAGES'})
@@ -21,35 +21,35 @@ export const searchImages = (searchText, previousSearchValues) => {
 
     dispatch({type: 'IMAGES@IMAGES_LOADING'})
 
-    if (previousSearchValues) {
+    loadImages(searchText, searchMode).then((images) => {
       dispatch({
         type: 'IMAGES@IMAGES_LOADED_SUCCESS',
-        payload: {images: previousSearchValues}
+        payload: {images}
       })
-    } else {
-      loadImages(searchText).then((images) => {
-        dispatch({
-          type: 'IMAGES@IMAGES_LOADED_SUCCESS',
-          payload: {images}
-        })
-      })
-    }
+    })
   }
 }
 
-export const saveSearch = (searchText, images) => {
+export const showTypingMessage = () => {
+  return {type: 'IMAGES@SHOW_TYPING_MESSAGE'}
+}
+
+export const saveSearch = (searchText) => {
   return (dispatch) => {
     dispatch({type: 'IMAGES@SEARCH_SAVE_LOADING'})
 
-    asyncLocalStorage.getItem('searchResults')
+    asyncLocalStorage.getItem('previousSearches')
       .then((result) => {
-        let searchResults = JSON.parse(result) || {}
-        searchResults[searchText] = images
+        const previousSearches = JSON.parse(result) || []
 
-        return asyncLocalStorage.setItem('searchResults', JSON.stringify(searchResults))
+        previousSearches.push(searchText)
+        return asyncLocalStorage.setItem('previousSearches', JSON.stringify(previousSearches))
       })
       .then(() => {
-        dispatch({type: 'IMAGES@SEARCH_SAVE_SUCCESS'})
+        dispatch({
+          type: 'IMAGES@SEARCH_SAVE_SUCCESS',
+          payload: {searchText}
+        })
 
         setTimeout(() => {
           dispatch({type: 'IMAGES@HIDE_SAVE_SUCCESS_MESSAGE'})

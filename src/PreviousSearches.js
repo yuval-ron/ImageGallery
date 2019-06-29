@@ -9,11 +9,11 @@ class PreviousSearches extends Component {
 
   componentDidMount () {
     const {loadPreviousSearches} = this.props
+
     loadPreviousSearches()
   }
 
   onPreviousSearchSelect = (e) => {
-    const {previousSearches} = this.props
     const {selectedPreviousItems} = this.state
 
     if (e.target.checked) {
@@ -26,35 +26,22 @@ class PreviousSearches extends Component {
     } else {
       const searchToDeleteIndex = selectedPreviousItems.indexOf(e.target.id)
       const selectedPreviousItemsAfterDelete = [...selectedPreviousItems]
+
       selectedPreviousItemsAfterDelete.splice(searchToDeleteIndex, 1)
 
       this.setState({selectedPreviousItems: selectedPreviousItemsAfterDelete})
     }
   }
 
-  onSearchClick = () => {
-    const {onPreviousSearchClick, previousSearches} = this.props
-    const {selectedPreviousItems} = this.state
-
-    const [previousSearchText] = selectedPreviousItems
-    const previousSearchValues = previousSearches[previousSearchText]
-    onPreviousSearchClick(previousSearchText, previousSearchValues)
+  createOnSearchClickCallback = (searchMode) => {
+    return () => this.onSearchClick(searchMode)
   }
 
-  onUnionSearchClick = () => {
-    const {onPreviousSearchClick, previousSearches} = this.props
+  onSearchClick = (searchMode) => {
+    const {searchImages} = this.props
     const {selectedPreviousItems} = this.state
 
-    const unionImages = {}
-    selectedPreviousItems.forEach((selectedPreviousItemText) => {
-      const currentPreviousSearchResults = previousSearches[selectedPreviousItemText]
-      currentPreviousSearchResults.forEach(image => unionImages[image.id] = image)
-    })
-    const previousSearchText = selectedPreviousItems.map(text => `"${text}"`)
-    onPreviousSearchClick(previousSearchText.join(' OR '), unionImages)
-  }
-
-  onIntersectionSearchClick = () => {
+    searchImages(selectedPreviousItems, {searchMode})
   }
 
   render() {
@@ -66,9 +53,9 @@ class PreviousSearches extends Component {
         <div className="search-options-container">
           <SearchOptionsButtons
             selectedPreviousItems={selectedPreviousItems}
-            onSearchClick={this.onSearchClick}
-            onUnionSearchClick={this.onUnionSearchClick}
-            onIntersectionSearchClick ={this.onIntersectionSearchClick}
+            onSingleSearchClick={this.createOnSearchClickCallback()}
+            onUnionSearchClick={this.createOnSearchClickCallback('any')}
+            onIntersectionSearchClick ={this.createOnSearchClickCallback('all')}
           />
         </div>
         <div className="previous-searches-list">
@@ -93,9 +80,7 @@ const mapDispatchToProps = {loadPreviousSearches}
 export default connect(mapStateToProps, mapDispatchToProps)(PreviousSearches)
 
 const PreviousSearchesList = ({previousSearches, onPreviousSearchSelect}) => {
-  const previousSearchesKeys = Object.keys(previousSearches)
-
-  return previousSearchesKeys.map((searchValue, index) => {
+  return previousSearches.map((searchValue, index) => {
     return <PreviousSearchesListItem
              key={`searches-list-item-${index}`}
              searchValue={searchValue}
@@ -117,11 +102,11 @@ const PreviousSearchesListItem = ({searchValue, onPreviousSearchSelect}) => {
   )
 }
 
-const SearchOptionsButtons = ({selectedPreviousItems, onSearchClick, onUnionSearchClick, onIntersectionSearchClick}) => {
+const SearchOptionsButtons = ({selectedPreviousItems, onSingleSearchClick, onUnionSearchClick, onIntersectionSearchClick}) => {
   const numberOfSelectedPreviousItemsToSearch = Object.keys(selectedPreviousItems).length
 
   if (numberOfSelectedPreviousItemsToSearch === 1) {
-    return <div className="search" onClick={onSearchClick}>Search</div>
+    return <div className="search" onClick={onSingleSearchClick}>Search</div>
   } else if (numberOfSelectedPreviousItemsToSearch > 1) {
     return (
       <div className="multi-search-container">

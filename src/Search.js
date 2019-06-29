@@ -5,11 +5,14 @@ export default class Search extends Component {
   handleChangeText = (e) => {
     const {searchImages} = this.props
 
-    searchImages(e.target.value)
+    searchImages(e.target.value, {
+      shouldShowTypingMessage: true
+    })
   }
 
   handleSaveSearch = () => {
     const {saveSearch} = this.props
+
     saveSearch()
   }
 
@@ -25,13 +28,15 @@ export default class Search extends Component {
   }
 
   render() {
+    const {searchText} = this.props
+
     return (
       <div>
         <div className="search-container">
           <AccessAlarmIcon className="previous-search-button" />
           <div className="title">Image Gallery</div>
           <div className="title sub-title">Search for images</div>
-          <input type="text" className="search-input" value={this.props.searchText} onChange={this.handleChangeText}></input>
+          <input type="text" className="search-input" value={searchText} onChange={this.handleChangeText}></input>
           {this.renderSaveSearchContent()}
         </div>
       </div>

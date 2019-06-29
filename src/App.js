@@ -1,9 +1,10 @@
 import React, {Component} from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
+import {debounce} from 'lodash'
 import Search from './Search.js'
 import PreviousSearches from './PreviousSearches.js'
-import {composeImageUrl} from './Utils.js'
-import {searchImages, saveSearch} from './modules/actions.js'
+import {composeImageUrl, composeSearchTextAsTags} from './Utils.js'
+import {searchImages, saveSearch, showTypingMessage} from './modules/actions.js'
 import './App.css'
 
 class App extends Component {
@@ -11,33 +12,41 @@ class App extends Component {
     searchText: ''
   }
 
-  searchImages = (searchText, previousSearchValues) => {
+  searchImages = (searchValue, {searchMode, shouldShowTypingMessage=false}={}) => {
+    const {showTypingMessage} = this.props
+    const searchText = composeSearchTextAsTags(searchValue)
+    const searchModeToDisplay = searchMode ? ` - (${searchMode === 'any' ? 'OR' : 'AND'})` : ''
+
+    this.setState({searchText: `${searchText}${searchModeToDisplay}`})
+    debugger
+    if (shouldShowTypingMessage) {
+      showTypingMessage()
+    }
+
+    this.debouncedSearchImages(searchText, searchMode)
+  }
+
+  debouncedSearchImages = debounce((searchText, searchMode) => {
     const {searchImages} = this.props
 
-    this.setState({searchText})
-    searchImages(searchText, previousSearchValues)
-  }
+    searchImages(searchText, searchMode)
+  }, 500)
 
   saveSearch = () => {
     const {searchText} = this.state
-    const {saveSearch, images} = this.props
+    const {saveSearch} = this.props
 
-    saveSearch(searchText, images)
-  }
-
-  onPreviousSearchClick = (previousSearchText, previousSearchValues) => {
-    this.searchImages(previousSearchText, previousSearchValues)
+    saveSearch(searchText)
   }
 
   renderImagesContainerContent = () => {
-    const {images, isLoadingNewImages} = this.props
+    const {images, isLoadingNewImages, isTypingMessageVisible} = this.props
     const {searchText} = this.state
 
     if (isLoadingNewImages) {
       return <div className="message loading-message">loading...</div>
-    } else if (images) {
-        return <ImagesCollection images={images} searchText={searchText} />
     }
+    return <ImagesCollection images={images} searchText={searchText} isTypingMessageVisible={isTypingMessageVisible} />
   }
 
   render() {
@@ -56,7 +65,7 @@ class App extends Component {
             {this.renderImagesContainerContent()}
           </div>
         </div>
-        <PreviousSearches onPreviousSearchClick={this.onPreviousSearchClick} />
+        <PreviousSearches searchImages={this.searchImages} />
       </div>
     )
   }
@@ -66,15 +75,18 @@ const mapStateToProps = state => ({
   images: state.imagesData.images,
   isLoadingNewImages: state.imagesData.isLoadingNewImages,
   isSearchSaveLoading: state.imagesData.isSearchSaveLoading,
-  shouldShowSuccessMessage: state.imagesData.shouldShowSuccessMessage
+  shouldShowSuccessMessage: state.imagesData.shouldShowSuccessMessage,
+  isTypingMessageVisible: state.imagesData.isTypingMessageVisible
 })
 
-const mapDispatchToProps = {searchImages, saveSearch}
+const mapDispatchToProps = {searchImages, saveSearch, showTypingMessage}
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
 
-const ImagesCollection = ({images, searchText}) => {
-  if (!images) {
+const ImagesCollection = ({images, searchText, isTypingMessageVisible}) => {
+  if (isTypingMessageVisible) {
+    return <div className="message">Typing... :)</div>
+  } else if (!images) {
     return <div className="message">Please search images!</div>
   } else if (images.length === 0) {
     return <div className="message">{`No results for "${searchText}".`}</div>
